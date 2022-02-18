@@ -1,0 +1,34 @@
+#include <algorithm>
+#include <iostream>
+
+using namespace std;
+
+
+bool cmp(string& a, string& b) {
+    if (a.size() < b.size()) { return false; }
+    else { return true; }
+}
+
+
+int main() {
+    int n;    //количество строк
+    cin >> n;
+
+    string arr[n];
+    for (int i = 0; i < n; ++i) {
+        cin >> arr[i];  //заполняем массив
+    }
+
+    sort(arr, arr + n, cmp);   //сортируем
+
+    for (string& s : arr) {
+        cout << s << endl;
+    }
+
+    int k;  //получаем длину искомой строки
+    cin >> k;
+    for (string& s : arr) {   //находим и выводим нужные строки
+        if (s.size() == k)
+            cout << s << endl;
+    }
+}
