@@ -1,0 +1,115 @@
+#include <algorithm>
+#include <iostream>
+
+using namespace std;
+
+
+struct Time {
+    string hour, minute, second;
+    int total;
+};
+
+
+struct Flight {
+    string point_of_departure, point_of_arrival;
+    Time departure_time, arrival_time;
+    int wagons, passengers;
+};
+
+
+
+struct Node {
+    Flight flight;
+    Node* ptr;
+};
+
+
+struct List {
+    Node* root;
+
+    List() {
+        root = nullptr;
+    }
+
+    void addNode(Flight& f) {
+        Node* nd = new Node;
+        nd->flight = f;
+        nd->ptr = nullptr;
+        if(root == nullptr) {
+            root = nd;
+        } else {
+            Node* current = root;
+            while(current->ptr != nullptr)
+                current = current->ptr;
+            current->ptr = nd;
+        }
+    }
+
+    void printDepTime() const {
+        Node* current = root;
+        while(current != nullptr) {
+            cout << current->flight.departure_time.hour << ':' << current->flight.departure_time.minute <<
+                 ':' << current->flight.departure_time.second << endl;
+            current = current->ptr;
+        }
+    }
+
+    void printDepTimeBeforeCurTime(Time& t) const {
+        Node* current = root;
+        while(current != nullptr) {
+            if (t.total > current->flight.departure_time.total) {
+                cout << current->flight.departure_time.hour << ':' << current->flight.departure_time.minute <<
+                     ':' << current->flight.departure_time.second << endl;
+            }
+            current = current->ptr;
+        }
+    }
+};
+
+
+int main() {
+    int n;    //количество структур Flight
+    cin >> n;
+    List lst;
+
+    for (int i = 0; i < n; ++i) {   //заполняем список
+        Flight flight;
+        cout << "Введите пункт отправления\n";
+        cin >> flight.point_of_departure;
+        cout << "Введите пункт прибытия\n";
+        cin >> flight.point_of_arrival;
+        cout << "Введите количество вагонов\n";
+        cin >> flight.wagons;
+        cout << "Введите количество пассажирских мест\n";
+        cin >> flight.passengers;
+        cout << "Введите время отправления в формате 'hh:mm:ss'\n";
+        string time;
+        cin >> time;
+        flight.departure_time.hour = time.substr(0, 2);
+        flight.departure_time.minute = time.substr(3, 2);
+        flight.departure_time.second = time.substr(6, 2);
+        flight.departure_time.total = stoi(time.substr(0, 2)) * 3600 +
+                stoi(time.substr(3, 2)) * 60 + stoi(time.substr(6, 2));
+        cout << "Введите время прибытия в формате 'hh:mm:ss'\n";
+        cin >> time;
+        flight.arrival_time.hour = time.substr(0, 2);
+        flight.arrival_time.minute = time.substr(3, 2);
+        flight.arrival_time.second = time.substr(6, 2);
+        flight.arrival_time.total = stoi(time.substr(0, 2)) * 3600 +
+                stoi(time.substr(3, 2)) * 60 + stoi(time.substr(6, 2));
+        cout << endl;
+        lst.addNode(flight);
+    }
+
+    lst.printDepTime();
+
+    Time t;  //получаем час отправления
+    cout << "Введите значение часа отправления в формате 'hh'\n";
+    string time;
+    cin >> time;
+    t.hour = time;
+    t.minute = '0';
+    t.second = '0';
+    t.total = stoi(time) * 3600;
+    lst.printDepTimeBeforeCurTime(t);  //вывод времени отправления рейсов до введенного часа
+}
