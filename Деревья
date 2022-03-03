@@ -26,6 +26,11 @@ struct Node {
         key = new_key;
         l = r = nullptr;
     }
+
+    ~Node() {
+        delete l;
+        delete r;
+    }
 };
 
 
@@ -63,6 +68,10 @@ struct Tree {
                  ':' << tree->key.departure_time.second << endl;
             order(tree->l);
         }
+    }
+    
+    ~Tree() {
+        delete root;
     }
 };
 
