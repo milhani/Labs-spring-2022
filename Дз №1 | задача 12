@@ -1,0 +1,96 @@
+#include <cstdlib>
+#include <iostream>
+
+using namespace std;
+
+/*
+ 12. Написать программу для выполнения следующих действий:
+Определить двоичное дерево поиска для хранения квадратных матриц целых чисел размером 10 на 10,
+в качестве ключа использовать сумму всех элементов матрицы.
+Заполнить дерево 10-ю матрицами, заполненных случайными символами.
+Вывести на экран матрицы, используя префиксную форму обхода.
+ */
+
+
+struct Matrix {
+    int matrix[10][10]{};
+    size_t sum = 0;
+};
+
+
+
+struct Node {
+    Matrix key;
+    Node* l;
+    Node* r;
+
+    explicit Node(Matrix& new_key) {
+        key = new_key;
+        l = r = nullptr;
+    }
+
+    ~Node() {
+        delete l;
+        delete r;
+    }
+};
+
+
+struct Tree {
+    Node* root;
+    Tree() : root(nullptr) { }
+
+    void insert(Matrix& m) {
+        insert(root, m);
+    }
+
+    void insert(Node*& tree, Matrix& m) {
+        if (tree == nullptr) {
+            tree = new Node(m);
+            return;
+        }
+        if (m.sum < tree->key.sum) {
+            insert(tree->l, m);
+        } else {
+            insert(tree->r, m);
+        }
+    }
+
+    void order(Node*& tree) {
+        if (tree != nullptr) {
+            order(tree->l);
+            for (auto& i : tree->key.matrix) {
+                for (int& j : i) {
+                    cout << j << "\t";
+                }
+                cout << "\n";
+            }
+            cout << "\n\n";
+            order(tree->r);
+        }
+    }
+
+    ~Tree() {
+        delete root;
+    }
+};
+
+
+int main() {
+    const int n = 10;
+    Tree tree;
+
+    for (int s = 0; s < n; ++s) {  //заполняем матрицу и отправляем ее в дерево
+        Matrix m;
+        for (auto& i : m.matrix) {
+             for (int& j : i) {
+                 int x = rand();
+                 j = x;
+                 m.sum += x;
+             }
+        }
+        tree.insert(m);
+    }
+
+    tree.order(tree.root);  //выводим матрицы в порядке возрастания суммы элементов
+}
