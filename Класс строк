@@ -1,0 +1,83 @@
+#include <iostream>
+
+
+class String {
+private:
+     char s[20];
+
+public:
+    String (char new_s[20]) {
+        strcpy(s, new_s);
+    }
+
+    int len_string() {
+        int ans = 0;
+        for (int i = 0; i < 20; ++i) {
+            if (s[i] == '\0') {
+                return ans;
+            }
+            ++ans;
+        }
+    }
+
+    void print_string() {
+        std::cout << s << std::endl;
+    }
+
+    char return_symbol(int ind) {
+        return s[ind];
+    }
+
+    void insert_val_to_i (int ind, char val) {
+        s[ind] = val;
+    }
+
+    void substring(int len, int ind) {
+        char new_s[20];
+        for (int i = 0; i < len; ++i) {
+            new_s[i] = s[ind + i];
+        }
+        std::cout << new_s << std::endl;
+    }
+
+    bool cont(char val) {
+        for (char c : s) {
+            if (c == val) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void change(int i, int j) {
+        char temp = s[i];
+        s[i] = s[j];
+        s[j] = temp;
+    }
+};
+
+
+int main() {
+    char st[20];
+    std::cin >> st;
+    String s(st);
+
+    std::cout << s.len_string() << std::endl;  // длина
+    s.print_string();                // вывод строки
+    std::cout << s.return_symbol(2) << std::endl;  //вывод символа
+    s.insert_val_to_i(2, 'r');   //установка заданного символа на заданную позицию
+    s.print_string();
+    s.substring(3, 2); //вывод подстроки  rde
+    std::cout << s.cont('a') << std::endl; //проверка на содержание
+    s.change(0, 1); //поменять i на j
+    s.print_string();
+
+    char st2[20] = {'a', 'b', 'c', 'd', 'e', 'f', 'g'};
+    String s2(st2);
+    s2.print_string();
+
+    char st3[20] = "umbrella";
+    String s3 = st3;
+    s3.print_string();
+
+}
