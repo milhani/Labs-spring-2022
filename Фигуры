@@ -1,0 +1,191 @@
+#include <cstdlib>
+#include <iostream>
+#include <iterator>
+#include <list>
+
+
+struct Coord {
+    int x, y;
+
+    Coord(int a, int b) {
+        x = a;
+        y = b;
+    }
+};
+
+
+class Point {
+private:
+    Coord coord;
+
+public:
+    explicit Point (Coord& c) : coord(c) {}
+
+    void change_point(Coord& c) { coord = c; }
+
+    void get_point() const {
+        std::cout << "Абсцисса точки: " << coord.x << ".\n" <<
+                     "Ордината точки: " << coord.y << ".\n";
+    }
+};
+
+
+class Line {
+private:
+    Coord f_coord, s_coord;
+
+public:
+    Line(Coord& f, Coord& s) : f_coord(f), s_coord(s) {}
+
+    void set_first(Coord& c) { f_coord = c; }
+
+    void set_second(Coord& c) { s_coord = c; }
+
+    void get_line() const {
+        std::cout << "Координаты первой точки прямой: (" << f_coord.x << ", " << f_coord.y << ").\n" <<
+                     "Координаты второй точки прямой: (" << s_coord.x << ", " << s_coord.y << ").\n";
+    }
+};
+
+
+class Triangle {
+private:
+    Coord f_coord, s_coord, t_coord;
+
+public:
+    Triangle(Coord& f, Coord& s, Coord& t) : f_coord(f), s_coord(s), t_coord(t) {}
+
+    void set_first(Coord& c) { f_coord = c; }
+
+    void set_second(Coord& c) { s_coord = c; }
+
+    void set_third(Coord& c) { t_coord = c; }
+
+    void get_triangle() const {
+        std::cout << "Координаты первой вершины треугольника: (" << f_coord.x << ", " << f_coord.y << ").\n" <<
+                     "Координаты второй вершины треугольника: (" << s_coord.x << ", " << s_coord.y << ").\n" <<
+                     "Координаты третьей вершины треугольника: (" << t_coord.x << ", " << t_coord.y << ").\n";
+    }
+};
+
+
+class Circle {
+private:
+    Coord centre;
+    double radius;
+
+public:
+    Circle(Coord& c, double& r) : centre(c), radius(r) {}
+
+    explicit Circle(Coord& c) : centre(c), radius(1.0) {}
+
+    explicit Circle(double& r) : centre(Coord(1, 1)), radius(r) {}
+
+    void change_centre(Coord& c) { centre = c; }
+
+    void change_radius(double& r) { radius = r; }
+
+    void get_circle() const {
+        std::cout << "Centre is (" << centre.x << ", " << centre.y << ").\n";
+        std::cout << "Radius is " << radius<< ".\n";
+    }
+};
+
+
+class Polygon {
+private:
+    std::list<Line*> vertex;
+
+public:
+    explicit Polygon(std::list<Line*>& lines) : vertex(lines) {}
+
+    void change_polygon(int ind, Line* new_l) {
+        auto it = vertex.begin();
+        std::advance(it, ind);
+        vertex.insert(it, new_l);
+        std::advance(it, 1);
+        vertex.erase(it);
+    }
+
+    void get_polygon() {
+        for (Line* v : vertex) {
+            v->get_line();
+        }
+    }
+};
+
+
+int main() {
+    //Point
+    Coord c(1, 3);
+    Point p(c);
+    std::cout << "Изначальные данные\n";
+    p.get_point();
+    std::cout << "\n";
+    Coord new_c(4, 5);
+    p.change_point(new_c);
+    std::cout << "Новые данные\n";
+    p.get_point();
+    std::cout << "\n\n";
+
+    //Line
+    Coord fl(1, 2), sl(2, 2);
+    Line l(fl, sl);
+    std::cout << "Изначальные данные\n";
+    l.get_line();
+    std::cout << "\n";
+    Coord new_fl(2, 2), new_sl(3, 3);
+    l.set_first(new_fl);
+    l.set_second(new_sl);
+    std::cout << "Новые данные\n";
+    l.get_line();
+    std::cout << "\n\n";
+
+    //Triangle
+    Coord ft(2, 3), st(5, 6), tt(8, 8);
+    Triangle t(ft, st, tt);
+    std::cout << "Изначальные данные\n";
+    t.get_triangle();
+    std::cout << "\n";
+    Coord new_ft(12, 34), new_st(12, 45), new_tt(88, 67);
+    t.set_first(new_ft);
+    t.set_second(new_st);
+    t.set_third(new_tt);
+    std::cout << "Новые данные\n";
+    t.get_triangle();
+    std::cout << "\n\n";
+
+    //Circle
+    Coord centre(0, 0);
+    double r = 5.0;
+    Circle circle(centre, r);
+    std::cout << "Изначальные данные\n";
+    circle.get_circle();
+    std::cout << "\n";
+    Coord new_centre(2, 3);
+    double new_r = 6;
+    circle.change_centre(new_centre);
+    circle.change_radius(new_r);
+    std::cout << "Новые данные\n";
+    circle.get_circle();
+    std::cout << "\n\n";
+
+    //Polygon
+    int n = 10;
+    std::list<Line*> lines;
+    for (int i = 0; i < n; ++i) {
+        Coord fcl(std::rand(), std::rand()), scl(std::rand(), std::rand());
+        Line line(fcl, scl);
+        lines.push_back(&line);
+    }
+    Polygon polygon(lines);
+    std::cout << "Изначальные данные\n";
+    polygon.get_polygon();
+    std::cout << "\n";
+    Coord nfcl(9, 0), nscl(8, 0);
+    Line new_line(nfcl, nscl);
+    int ind = 2;
+    polygon.change_polygon(ind, &new_line);
+    std::cout << "Новые данные\n";
+    polygon.get_polygon();
+}
