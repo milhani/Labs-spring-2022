@@ -1,0 +1,59 @@
+#include <iostream>
+
+using namespace std;
+
+
+struct Zakazy {
+    string m_dostaski;
+    double d_dostavki;
+    string imya_poluch;
+    int cena_zakaza;
+};
+
+
+struct Node {  //элемент списка, который в себе содержит объект типа Zakazy и указатель на следующий элемент списка
+    Zakazy zakaz;
+    Node* ptr;
+};
+
+
+struct List {  //в этой структуре содержится указатель на корень (=начало) списка
+    Node* root;
+
+    List() { //сначала у нас список пустой, поэтому указатель на корень нулевой
+        root = nullptr; //«нулевой» означает, что указатель пока ни на что не указывает, и обозначается как nullptr
+    }
+
+    void addNode(Zakazy& z) { //добавляем элемент в список
+        Node* nd = new Node;  //создаем указатель на новый элемент, назовем его nd
+        nd->zakaz = z;  //кладем в этот элемент объект типа Zakazy
+        nd->ptr = nullptr;  //пока следующего элемента нет, так что делаем указатель на следующий элемент нулевым
+        if(root == nullptr) { //если список пустой, то корень (=начало списка) делаем рвным элементу nd
+            root = nd;
+        } else { //если список не пустой, то проходимся по нему, пока не уткнемся в конец
+            Node* current = root;
+            while(current->ptr != nullptr)
+                current = current->ptr;
+            current->ptr = nd; //уткнулись в конец и добавили элемент nd
+        }
+    }
+};
+
+
+int main() {
+    List lst; //создаем список заказов
+
+    for (int i = 0; i < 10; i++) {
+        Zakazy z; //создаем заказ и вводим для него данные
+        cout << "ВВЕДИТЕ ИМЯ ПОЛУЧАТЕЛЯ: ";
+        cin >> z.imya_poluch;
+        cout << "ВВЕДИТЕ МЕСТО ДОСТАВКИ: ";
+        cin >> z.m_dostaski;
+        cout << "ВВЕДИТЕ ДАТУ ДОСТАВКИ: ";
+        cin >> z.d_dostavki;
+        cout << "ВВЕДИТЕ ЦЕНУ ЗАКАЗА: ";
+        cin >> z.cena_zakaza;
+
+        lst.addNode(z); //добавляем с список заказ 
+    }
+}
