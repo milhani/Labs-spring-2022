@@ -17,6 +17,8 @@ struct Coord {
 class Figure {
 public:
     virtual void Draw() const = 0;
+
+    virtual void Move(int x, int y) = 0;
 };
 
 
@@ -27,11 +29,16 @@ private:
 public:
     explicit Point (Coord& c) : coord(c) {}
 
-    void change_point(Coord& c) { coord = c; }
+    //void change_point(Coord& c) { coord = c; }
 
     virtual void Draw() const {
         std::cout << "Абсцисса точки: " << coord.x << ".\n" <<
-                     "Ордината точки: " << coord.y << ".\n";
+                  "Ордината точки: " << coord.y << ".\n";
+    }
+
+    virtual void Move(int x, int y) {
+        coord.x += x;
+        coord.y += y;
     }
 };
 
@@ -43,13 +50,21 @@ private:
 public:
     Line(Coord& f, Coord& s) : f_coord(f), s_coord(s) {}
 
-    void set_first(Coord& c) { f_coord = c; }
+    //void set_first(Coord& c) { f_coord = c; }
 
-    void set_second(Coord& c) { s_coord = c; }
+    //void set_second(Coord& c) { s_coord = c; }
 
     virtual void Draw() const {
         std::cout << "Координаты первой точки прямой: (" << f_coord.x << ", " << f_coord.y << ").\n" <<
-                     "Координаты второй точки прямой: (" << s_coord.x << ", " << s_coord.y << ").\n";
+                  "Координаты второй точки прямой: (" << s_coord.x << ", " << s_coord.y << ").\n";
+    }
+
+    virtual void Move(int x, int y) {
+        f_coord.x += x;
+        f_coord.y += y;
+
+        s_coord.x += x;
+        s_coord.y += y;
     }
 };
 
@@ -61,16 +76,27 @@ private:
 public:
     Triangle(Coord& f, Coord& s, Coord& t) : f_coord(f), s_coord(s), t_coord(t) {}
 
-    void set_first(Coord& c) { f_coord = c; }
+    //void set_first(Coord& c) { f_coord = c; }
 
-    void set_second(Coord& c) { s_coord = c; }
+    //void set_second(Coord& c) { s_coord = c; }
 
-    void set_third(Coord& c) { t_coord = c; }
+    //void set_third(Coord& c) { t_coord = c; }
 
     virtual void Draw() const {
         std::cout << "Координаты первой вершины треугольника: (" << f_coord.x << ", " << f_coord.y << ").\n" <<
-                     "Координаты второй вершины треугольника: (" << s_coord.x << ", " << s_coord.y << ").\n" <<
-                     "Координаты третьей вершины треугольника: (" << t_coord.x << ", " << t_coord.y << ").\n";
+                  "Координаты второй вершины треугольника: (" << s_coord.x << ", " << s_coord.y << ").\n" <<
+                  "Координаты третьей вершины треугольника: (" << t_coord.x << ", " << t_coord.y << ").\n";
+    }
+
+    virtual void Move(int x, int y) {
+        f_coord.x += x;
+        f_coord.y += y;
+
+        s_coord.x += x;
+        s_coord.y += y;
+
+        t_coord.x += x;
+        t_coord.y += y;
     }
 };
 
@@ -87,35 +113,46 @@ public:
 
     explicit Circle(double& r) : centre(Coord(1, 1)), radius(r) {}
 
-    void change_centre(Coord& c) { centre = c; }
+    //void change_centre(Coord& c) { centre = c; }
 
-    void change_radius(double& r) { radius = r; }
+    //void change_radius(double& r) { radius = r; }
 
     virtual void Draw() const {
         std::cout << "Centre is (" << centre.x << ", " << centre.y << ").\n";
         std::cout << "Radius is " << radius<< ".\n";
+    }
+
+    virtual void Move(int x, int y) {
+        centre.x += x;
+        centre.y += y;
     }
 };
 
 
 class Polygon : public Figure {
 private:
-    std::list<Line*> vertex;
+    std::list<Line> vertex;
 
 public:
-    explicit Polygon(std::list<Line*>& lines) : vertex(lines) {}
+    explicit Polygon(std::list<Line>& lines) : vertex(lines) {}
 
-    void change_polygon(int ind, Line* new_l) {
+   /* void change_polygon(int ind, Line* new_l) {
         auto it = vertex.begin();
         std::advance(it, ind);
         vertex.insert(it, new_l);
         std::advance(it, 1);
         vertex.erase(it);
-    }
+    }*/
 
     virtual void Draw() const {
-        for (Line* v : vertex) {
-            v->Draw();
+        for (Line v : vertex) {
+            v.Draw();
+        }
+    }
+
+    virtual void Move(int x, int y) {
+        for (auto it = vertex.begin(); it != vertex.end(); ++it) {
+            (*it).Move(x, y);
         }
     }
 };
@@ -131,6 +168,13 @@ public:
     void draw() {
         for (Figure* f : figures) {
             f->Draw();
+            std::cout << "\n";
+        }
+    }
+
+    void move(int x, int y) {
+        for (Figure* f : figures) {
+            f->Move(x, y);
             std::cout << "\n";
         }
     }
@@ -162,11 +206,11 @@ int main() {
 
     //Polygon
     int n = 10;
-    std::list<Line*> lines;
+    std::list<Line> lines;
     for (int i = 0; i < n; ++i) {
         Coord fcl(std::rand(), std::rand()), scl(std::rand(), std::rand());
         Line l(fcl, scl);
-        lines.push_back(&l);
+        lines.push_back(l);
     }
     Polygon polygon(lines);
     draw.add(&polygon);
@@ -176,32 +220,21 @@ int main() {
     std::cout << "\n\n";
 
 
+    int x = 2, y = 3;
     //Change point
-    Coord new_c(4, 5);
-    point.change_point(new_c);
+    point.Move(x, y);
 
     //Change line
-    Coord new_fl(2, 2), new_sl(3, 3);
-    line.set_first(new_fl);
-    line.set_second(new_sl);
+    line.Move(x, y);
 
     //Change triangle
-    Coord new_ft(12, 34), new_st(12, 45), new_tt(88, 67);
-    triangle.set_first(new_ft);
-    triangle.set_second(new_st);
-    triangle.set_third(new_tt);
+    triangle.Move(x, y);
 
     //Change circle
-    Coord new_centre(2, 3);
-    double new_r = 6;
-    circle.change_centre(new_centre);
-    circle.change_radius(new_r);
+    circle.Move(x, y);
 
     //Change polygon
-    Coord nfcl(9, 0), nscl(8, 0);
-    Line new_line(nfcl, nscl);
-    int ind = 2;
-    polygon.change_polygon(ind, &new_line);
+    polygon.Move(x, y);
 
     std::cout << "Новые данные\n";
     draw.draw();
