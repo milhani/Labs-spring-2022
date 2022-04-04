@@ -1,0 +1,153 @@
+#include <iostream>
+#include <utility>
+
+using namespace std;
+
+
+/*
+Написать программу для выполнения следующих действий:
+Определить список для хранения информации о заказах товаров. Каждый заказ – это список товаров, место доставки, дата доставки и т.п.
+Для каждого товара должна храниться следующая информация: наименование, стоимость, срок годности и т.п. (предложите сами)
+Задать значение массива товаров с клавиатуры (не более 10 товаров)
+Отсортировать и вывести на экран список заказов по возрастанию общей стоимости заказа
+ */
+
+
+struct Tovar {
+    string nazva;
+    double s_godnosti;
+    int cena_rub;
+};
+
+
+struct NodeZakazy{
+    Tovar tovar;
+    NodeZakazy* ptr;
+};
+
+struct Zakazy {
+    NodeZakazy* root;
+    string m_dostaski;
+    double d_dostavki;
+    string imya_poluch;
+    int cena_zakaza;
+
+    Zakazy() {
+        root = nullptr;
+    }
+
+    void add(Tovar& t) {
+        NodeZakazy* nd = new NodeZakazy;
+        nd->tovar = t;
+        nd->ptr = nullptr;
+        if(root == nullptr) {
+            root = nd;
+        } else {
+            NodeZakazy* current = root;
+            while(current->ptr != nullptr)
+                current = current->ptr;
+            current->ptr = nd;
+        }
+    }
+};
+
+struct NodeList{
+    Zakazy zakaz;
+    NodeList* ptr;
+};
+
+struct List {
+    NodeList* root;
+
+    List() {
+        root = nullptr;
+    }
+
+    void add(Zakazy& z) {
+        NodeList* nd = new NodeList;
+        nd->zakaz = z;
+        nd->ptr = nullptr;
+        if(root == nullptr) {
+            root = nd;
+        } else {
+            NodeList* current = root;
+            while(current->ptr != nullptr)
+                current = current->ptr;
+            current->ptr = nd;
+        }
+    }
+
+    void Sort() {
+        NodeList* a, *b, *p, *h = nullptr;
+
+        for(NodeList* i = root; i != nullptr; ) {
+            a = i;
+            i = i->ptr;
+            b = h;
+            for(p = nullptr; (b != nullptr) && (a->zakaz.cena_zakaza > b->zakaz.cena_zakaza); ) {
+                p = b;
+                b = b->ptr;
+            }
+
+            if(p == nullptr){
+                a->ptr = h;
+                h = a;
+            } else {
+                a->ptr = b;
+                p->ptr = a;
+            }
+        }
+        if (h != nullptr)
+            root = h;
+    }
+
+    void print(){
+        for(const NodeList* p = root; p != nullptr; p = p->ptr) {
+            cout << p->zakaz.cena_zakaza << ' ' << p->zakaz.m_dostaski << ' ' << p->zakaz.imya_poluch << endl;
+        }
+    }
+};
+
+
+int main() {
+    setlocale(LC_ALL, "Rus");
+
+    int amount_of_zakaz, amount_of_tovar;
+    cout << "ВВЕДИТЕ КОЛИЧЕСТВО ЗАКАЗОВ: ";
+    cin >> amount_of_zakaz;
+
+
+    List lst;
+
+    for (int i = 0; i < amount_of_zakaz; i++) {
+        Zakazy z;
+        cout << "ВВЕДИТЕ ИМЯ ПОЛУЧАТЕЛЯ: ";
+        cin >> z.imya_poluch;
+        cout << "ВВЕДИТЕ МЕСТО ДОСТАВКИ: ";
+        cin >> z.m_dostaski;
+        cout << "ВВЕДИТЕ ДАТУ ДОСТАВКИ: ";
+        cin >> z.d_dostavki;
+        cout << "ВВЕДИТЕ ЦЕНУ ЗАКАЗА: ";
+        cin >> z.cena_zakaza;
+        cout << "ВВЕДИТЕ КОЛИЧЕСТВО ТОВАРОВ: ";
+        cin >> amount_of_tovar;
+
+        for (int j = 0; j < amount_of_tovar; j++) {
+            Tovar t;
+            cout << "ВВЕДИТЕ НАЗВАНИЕ: ";
+            cin >> t.nazva;
+            cout << "ВВЕДИТЕ ЦЕНУ В РУБЛЯХ: ";
+            cin >> t.cena_rub;
+            cout << "ВВЕДИТЕ СРОК ГОДНОСТИ: ";
+            cin >> t.s_godnosti;
+            z.add(t);
+        }
+
+        lst.add(z);
+    }
+
+    lst.Sort();
+    lst.print();
+
+    return 0;
+}
