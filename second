@@ -1,0 +1,19 @@
+class Drawing {
+private:
+    std::list<Figure*> figures;
+
+public:
+    void add(Figure* f) { figures.push_back(f); }
+
+    void draw() {
+        for (Figure* f : figures) {
+            f->Draw();
+        }
+    }
+
+    void move(int x, int y) {
+        for (Figure* f : figures) {
+            f->Move(x, y);
+        }
+    }
+};
