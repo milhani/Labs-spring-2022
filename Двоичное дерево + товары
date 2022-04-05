@@ -1,0 +1,115 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+/*
+Написать программу для выполнения следующих действий:
+Создать двоичное дерево поиска для товаров. Для каждого товара должна храниться следующая информация: наименование,
+стоимость, срок годности и т.п. (предложите сами). Сравнение товаров проводить по наименованию.
+Задать значение дерева товаров с клавиатуры (не более 10 товаров). Ввести наименование товара с клавиатуры.
+Найти товар с заданным наименованием в дереве и, если найден, вывести всю информацию о нём.
+ */
+
+
+struct Date {
+    int year, month, day;
+};
+
+
+struct Product {
+    string name, manufacturer;
+    int price;
+    Date expiration_date;
+};
+
+
+struct Node {
+    Product key;
+    Node* l;
+    Node* r;
+
+    explicit Node(Product& new_key) {
+        key = new_key;
+        l = r = nullptr;
+    }
+
+    ~Node() {
+        delete l;
+        delete r;
+    }
+};
+
+
+struct Tree {
+    Node* root;
+
+    Tree() : root(nullptr) { }
+
+    void insert(Product& prod) {
+        insert(root, prod);
+    }
+
+    void insert(Node*& tree, Product& prod) {
+        if (tree == nullptr) {
+            tree = new Node(prod);
+            return;
+        }
+        if (prod.name < tree->key.name) {
+            insert(tree->l, prod);
+        } else {
+            insert(tree->r, prod);
+        }
+    }
+
+    void order(Node*& tree, string& k) {
+        if (tree != nullptr) {
+            order(tree->l, k);
+            if (tree->key.name == k) {
+                cout << "Товар найден!\n";
+                cout << "Название: " << tree->key.name << endl;
+                cout << "Цена: " << tree->key.price << endl;
+                cout << "Производитель: " << tree->key.manufacturer << endl;
+                cout << "Срок годности: " << tree->key.expiration_date.day << "." <<
+                         tree->key.expiration_date.month << "." <<
+                         tree->key.expiration_date.year  << endl;
+                cout << endl;
+            }
+            order(tree->r, k);
+        }
+    }
+
+    ~Tree() {
+        delete root;
+    }
+};
+
+
+int main() {
+    int n;
+    cin >> n;
+
+    Tree tree;
+
+    for (int i = 0; i < n; ++i) {  //Получаем информацию о товаре и добавляем его в дерево
+        Product p;
+        cout << "Введите название товара: ";
+        cin >> p.name;
+        cout << "Введите цену товара: ";
+        cin >> p.price;
+        cout << "Введите производителя товара: ";
+        cin >> p.manufacturer;
+        cout << "Введите срок годности товара в формате dd.mm.yy: ";
+        string date;
+        cin >> date;
+        p.expiration_date.day = stoi(date.substr(0, 2));
+        p.expiration_date.month = stoi(date.substr(3, 2));
+        p.expiration_date.year = stoi(date.substr(6, 2));
+        cout << endl;
+        tree.insert(p);
+    }
+
+    string name;
+    cin >> name;
+    tree.order(tree.root, name);  //Выводим товары с заданным наименованием
+}
